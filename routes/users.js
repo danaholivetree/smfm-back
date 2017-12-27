@@ -30,6 +30,7 @@ router.post('/', function(req, res, next) {
             res.send(JSON.stringify(newUser))
           })
       }
+      let user = exists
       console.log('user was in db');
       return knex('products')
         .select('*')
@@ -40,10 +41,11 @@ router.post('/', function(req, res, next) {
             console.log('user has no products for sale');
             res.setHeader("Content-Type", "application/json")
             res.send({})
-          }
+          } else {
           console.log('user has products for sale ', products);
           res.setHeader("Content-Type", "application/json")
           res.send(JSON.stringify(products))
+          }
         })
 
 
