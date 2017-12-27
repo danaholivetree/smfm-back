@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
   return knex.schema.createTable('products', t => {
     t.increments()
-    t.integer('seller_id').references("id").inTable("users").onDelete("CASCADE")
+    t.integer('seller_id').references('id').inTable('users').onDelete("CASCADE")
     t.varchar('item_name', 255).notNullable().defaultTo("")
     t.text('category').notNullable()
     t.varchar('price', 255).notNullable().defaultTo("0.00")

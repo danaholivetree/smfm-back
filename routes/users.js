@@ -8,11 +8,11 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
+  console.log('req.body in users/post ', req.body);
   if (!req.body.id) {
     return next(new Error('must have fb id in request'))
   }
   let id = +req.body.id
-  console.log('id numberified ', id);
   return knex('users')
     .select('*')
     .where('fb_id', req.body.id)
@@ -22,12 +22,12 @@ router.post('/', function(req, res, next) {
       if (!exists) {
           console.log('user was not in db, inserting ');
         return knex('users')
-          .insert({'fb_id': req.body.id})
+          .insert({'fb_id': req.body.id, 'name': req.body.name})
           .returning('*')
-          .finally( newUser => {
-            console.log('user returned from insert ', user);
+          .then( newUser => {
+            console.log('user returned from insert ', newUser);
             res.setHeader("Content-Type", "application/json")
-            res.send(user)
+            res.send(JSON.stringify(newUser))
           })
       }
       console.log('user was in db');
@@ -35,12 +35,15 @@ router.post('/', function(req, res, next) {
         .select('*')
         .where('seller_id', user.id)
         .then( products => {
-          if(!products) {
+          console.log('products ', products);
+          if (!products[0]) {
+            console.log('user has no products for sale');
             res.setHeader("Content-Type", "application/json")
             res.send({})
           }
+          console.log('user has products for sale ', products);
           res.setHeader("Content-Type", "application/json")
-          res.send(products)
+          res.send(JSON.stringify(products))
         })
 
 
