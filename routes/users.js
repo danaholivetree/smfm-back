@@ -40,7 +40,7 @@ router.post('/', function(req, res, next) {
           if (!products[0]) {
             console.log('user has no products for sale');
             res.setHeader("Content-Type", "application/json")
-            res.send({})
+            res.send(JSON.stringify({seller_id: user.id}))
           } else {
           console.log('user has products for sale ', products);
           res.setHeader("Content-Type", "application/json")
