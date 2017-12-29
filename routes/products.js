@@ -4,11 +4,31 @@ var knex = require('../knex')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  return knex('products')
+    .select('*')
+    .then ( products => {
+      res.setHeader('Content-type', 'application/json')
+      res.send(JSON.stringify(products))
+    })
 });
 
 router.get('/:id', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  console.log('getting to route for products by user id, user id is ', req.params.id)
+  return knex('products')
+    .select('*')
+    .where('seller_id', req.params.id)
+    .then( products => {
+      console.log('products ', products);
+      if (!products[0]) {
+        console.log('user has no products for sale');
+        res.setHeader("Content-Type", "application/json")
+        res.send(JSON.stringify({seller_id: user.id}))
+      } else {
+      console.log('user has products for sale ', products);
+      res.setHeader("Content-Type", "application/json")
+      res.send(JSON.stringify(products))
+      }
+    })
 });
 
 router.post('/', function(req, res, next) {

@@ -32,21 +32,22 @@ router.post('/', function(req, res, next) {
       }
       let user = exists
       console.log('user was in db');
-      return knex('products')
-        .select('*')
-        .where('seller_id', user.id)
-        .then( products => {
-          console.log('products ', products);
-          if (!products[0]) {
-            console.log('user has no products for sale');
-            res.setHeader("Content-Type", "application/json")
-            res.send(JSON.stringify({seller_id: user.id}))
-          } else {
-          console.log('user has products for sale ', products);
-          res.setHeader("Content-Type", "application/json")
-          res.send(JSON.stringify(products))
-          }
-        })
+      res.redirect(`/products/${user.id}`)
+      // return knex('products')
+      //   .select('*')
+      //   .where('seller_id', user.id)
+      //   .then( products => {
+      //     console.log('products ', products);
+      //     if (!products[0]) {
+      //       console.log('user has no products for sale');
+      //       res.setHeader("Content-Type", "application/json")
+      //       res.send(JSON.stringify({seller_id: user.id}))
+      //     } else {
+      //     console.log('user has products for sale ', products);
+      //     res.setHeader("Content-Type", "application/json")
+      //     res.send(JSON.stringify(products))
+      //     }
+      //   })
 
 
     }).catch( err => next(err))
