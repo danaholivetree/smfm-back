@@ -7,6 +7,28 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
+//search products by user id
+router.get('/:id', function(req, res, next) {
+  console.log('get products for sale by a user');
+  return knex('products')
+    .select('products.id as id', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url', 'sold', 'purchaser_id')
+    .where('seller_id', req.params.id)
+    .innerJoin('users', 'users.id', 'products.seller_id')
+    .then( products => {
+
+      if (!products[0]) {
+        console.log('user has no products for sale');
+        res.setHeader("Content-Type", "application/json")
+        res.send(JSON.stringify([]))// need to fix this
+      } else {
+      console.log('user has products for sale ', products);
+      let sendInfo = {products}
+      res.setHeader("Content-Type", "application/json")
+      res.send(JSON.stringify(sendInfo))
+      }
+    })
+})
+
 router.post('/', function(req, res, next) {
   console.log('req.body in users/post ', req.body);
   if (!req.body.id) {
@@ -27,29 +49,11 @@ router.post('/', function(req, res, next) {
           .then( newUser => {
             console.log('user returned from insert ', newUser);
             res.setHeader("Content-Type", "application/json")
-            res.send(JSON.stringify(newUser))
+            res.send(JSON.stringify({user: newUser}))
           })
       }
-      let user = exists
       console.log('user was in db');
-      res.redirect(`/products/${user.id}`)
-      // return knex('products')
-      //   .select('*')
-      //   .where('seller_id', user.id)
-      //   .then( products => {
-      //     console.log('products ', products);
-      //     if (!products[0]) {
-      //       console.log('user has no products for sale');
-      //       res.setHeader("Content-Type", "application/json")
-      //       res.send(JSON.stringify({seller_id: user.id}))
-      //     } else {
-      //     console.log('user has products for sale ', products);
-      //     res.setHeader("Content-Type", "application/json")
-      //     res.send(JSON.stringify(products))
-      //     }
-      //   })
-
-
+      res.redirect(`/users/${exists.id}`)
     }).catch( err => next(err))
 
 });

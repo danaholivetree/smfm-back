@@ -12,6 +12,7 @@ exports.up = function(knex, Promise) {
     t.boolean('sold').notNullable().defaultTo(false)
     t.integer('purchaser_id').references("id").inTable("users").onDelete("CASCADE")
     t.boolean('shipped').notNullable().defaultTo(false)
+    t.timestamps(true, true)
   })
 };
 
