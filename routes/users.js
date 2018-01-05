@@ -19,10 +19,10 @@ router.get('/:id', function(req, res, next) {
       if (!products[0]) {
         console.log('user has no products for sale');
         res.setHeader("Content-Type", "application/json")
-        res.send(JSON.stringify([]))// need to fix this
+        res.send(JSON.stringify({id: req.params.id, products: []}))// need to fix this
       } else {
       console.log('user has products for sale ', products);
-      let sendInfo = {products}
+      let sendInfo = {products, id: req.params.id}
       res.setHeader("Content-Type", "application/json")
       res.send(JSON.stringify(sendInfo))
       }

@@ -43,13 +43,22 @@ router.put('/:id', function(req, res, next) {
 })
 
 router.delete('/:id', function(req, res, next) {
-  console.log('delete a product by id ', req.params.id)
-  return knex('products')
-    .del()
+  let itemToDelete;
+  knex('products')
+    .select('*')
+    .first()
     .where('id', req.params.id)
-    .then( deleted => {
-      res.setHeader("Content-Type", "application/json")
-      res.send(JSON.stringify(product))
+    .then( item => {
+      itemToDelete = item
+      return knex('products')
+        .del()
+        .where('id', req.params.id)
+        .then( deleted => {
+          console.log('deleted ', deleted);
+          console.log('item to delete ', itemToDelete);
+          res.setHeader("Content-Type", "application/json")
+          res.send(JSON.stringify(itemToDelete))
+        })
     })
 })
 
