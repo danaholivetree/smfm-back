@@ -22,6 +22,7 @@ router.post('/', function(req, res, next) {
   knex('products')
     .insert(product)
     .returning('*')
+    .first()
     .then( newProduct => {
       res.setHeader('Content-type', 'application/json')
       res.send(JSON.stringify(newProduct))
