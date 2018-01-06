@@ -4,65 +4,69 @@ var knex = require('../knex')
 
 
 router.get('/', function(req, res, next) {
-  return knex('bookmarks')
+  return knex('cart')
     .select('*')
-    .then ( bookmarks => {
+    .then ( cartItems => {
       res.setHeader('Content-type', 'application/json')
-      res.send(JSON.stringify(bookmarks))
+      res.send(JSON.stringify(cartItems))
     })
 });
 
 router.get('/:id', function(req, res, next) {
-  console.log('getting to route for bookmarks by user id, user id is ', req.params.id)
-  return knex('bookmarks')
+  console.log('getting to route for cart by user id, user id is ', req.params.id)
+  return knex('cart')
     .select('*')
     .where('user_id', req.params.id)
-    .then( bookmarks => {
+    .then( cartItems => {
       // console.log('bookmarks ', bookmarks);
-      if (!bookmarks[0]) {
-        console.log('user has no bookmarks');
+      if (!cartItems[0]) {
+        console.log('user has no items in cart');
         res.setHeader("Content-Type", "application/json")
         res.send(JSON.stringify([]))
       } else {
-      console.log('user has bookmarks ', bookmarks);
+      console.log('user has shopping cart ', cartItems);
       res.setHeader("Content-Type", "application/json")
-      res.send(JSON.stringify(bookmarks))
+      res.send(JSON.stringify(cartItems))
       }
     })
 });
 
 router.post('/', function(req, res, next) {
-  let newBookmark
+
   console.log('req.body in bookmarks/post ', req.body)
   const {userId, productId} = req.body
+  let sendCartItem = {userId, productId}
   //add error handling for missing fields
-  const bookmark = {user_id: userId, product_id: productId}
+  const newCartItem = {user_id: userId, product_id: productId}
   knex('bookmarks')
-    .insert(bookmark)
+    .insert(newCartItem)
     .returning('*')
     .first()
-    .then( bm => {
-      newBookmark = {id: bm.id, productId: bm.product_id}
+    .then( newCartItem => {
+      console.log('newcartitem in db ', newCartItem);
+      sendCartItem.cartId = newCartItem.id
       return knex('products')
         .select('*')
-        .where('id', bm.product_id)
+        .where('id', productId)
         .first()
         .then( product => {
-          newBookmark.itemName = product.item_name
-          newBookmark.sellerName = product.seller_name
-          newBookmark.category = product.category
-          newBookmark.price = product.price
-          newBookmark.quantity = product.quantity
-          newBookmark.image = product.image
+          sendCartItem.id = product.id
+          sendCartItem.itemName = product.item_name
+          sendCartItem.category = product.category
+          sendCartItem.description = product.description
+          sendCartItem.price = product.price
+          sendCartItem.quantity = product.quantity
+          sendCartItem.image = product.image
           res.setHeader('Content-type', 'application/json')
-          res.send(JSON.stringify(newBookmark))
+          res.send(JSON.stringify(sendCartItem))
         })
+
     })
 })
 
 router.delete('/:id', function(req, res, next) {
-  console.log('bookmark to delete ', req.params.id)
-  knex('bookmarks')
+  console.log('cartItem to delete ', req.params.id)
+  knex('cart')
     .del()
     .where('id', req.params.id)
     .then( deleted => {
