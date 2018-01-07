@@ -18,7 +18,7 @@ router.get('/:id', function(req, res, next) {
     .select('bookmarks.id as id','products.id as productId', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url', 'sold', 'purchaser_id')
     .where('user_id', req.params.id)
     .innerJoin('products', 'bookmarks.product_id', 'products.id')
-    .innerJoin('users', 'user.id', 'products.seller_id')
+    .innerJoin('users', 'users.id', 'products.seller_id')
     .then( bookmarks => {
       if (!bookmarks[0]) {
         res.setHeader("Content-Type", "application/json")
@@ -31,31 +31,21 @@ router.get('/:id', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-  let newBookmark
-  console.log('req.body in bookmarks/post ', req.body)
-  const {userId, productId} = req.body
+  const {productId, userId} = req.body
   //add error handling for missing fields
   const bookmark = {user_id: userId, product_id: productId}
-  knex('bookmarks')
+  return knex('bookmarks')
     .insert(bookmark)
-    .returning('*')
+    .returning('bookmarks.id as id')
+    .innerJoin('products', 'bookmarks.product_id', 'products.id')
+    .select('products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy')
+    .innerJoin('users', 'users.id', 'products.seller_id')
+    .select('name as sellerName')
     .first()
-    .then( bm => {
-      newBookmark = {id: bm.id, productId: bm.product_id}
-      return knex('products')
-        .select('*')
-        .where('id', bm.product_id)
-        .first()
-        .then( product => {
-          newBookmark.itemName = product.item_name
-          newBookmark.sellerName = product.seller_name
-          newBookmark.category = product.category
-          newBookmark.price = product.price
-          newBookmark.quantity = product.quantity
-          newBookmark.image = product.image
-          res.setHeader('Content-type', 'application/json')
-          res.send(JSON.stringify(newBookmark))
-        })
+    .then( newBookmark => {
+      console.log('new bookmark info from db ', newBookmark);
+      res.setHeader('Content-type', 'application/json')
+      res.send(JSON.stringify(newBookmark))
     })
 })
 
