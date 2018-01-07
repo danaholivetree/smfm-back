@@ -36,8 +36,8 @@ router.post('/', function(req, res, next) {
   const {productId, userId} = req.body
   console.log('req.body ', productId, userId);
   //add error handling for missing fields
-  const cartItem = {user_id: userId, product_id: productId}
-  console.log('cartItem ', cartItem);
+  const cartItem = {user_id: userId, product_id: productId, }
+  console.log('cartItem ', cartItem) //correct
   return knex('cart')
     .insert(cartItem)
     .returning('cart.id as id')
