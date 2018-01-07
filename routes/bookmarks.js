@@ -15,18 +15,17 @@ router.get('/', function(req, res, next) {
 router.get('/:id', function(req, res, next) {
   console.log('getting to route for bookmarks by user id, user id is ', req.params.id)
   return knex('bookmarks')
-    .select('*')
+    .select('bookmarks.id as id','products.id as productId', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url', 'sold', 'purchaser_id')
     .where('user_id', req.params.id)
+    .innerJoin('products', 'bookmarks.product_id', 'products.id')
+    .innerJoin('users', 'user.id', 'products.seller_id')
     .then( bookmarks => {
-      // console.log('bookmarks ', bookmarks);
       if (!bookmarks[0]) {
-        console.log('user has no bookmarks');
         res.setHeader("Content-Type", "application/json")
         res.send(JSON.stringify([]))
       } else {
-      console.log('user has bookmarks ', bookmarks);
-      res.setHeader("Content-Type", "application/json")
-      res.send(JSON.stringify(bookmarks))
+        res.setHeader("Content-Type", "application/json")
+        res.send(JSON.stringify(bookmarks))
       }
     })
 });

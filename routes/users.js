@@ -9,22 +9,18 @@ router.get('/', function(req, res, next) {
 
 //search products by user id
 router.get('/:id', function(req, res, next) {
-  console.log('get products for sale by a user');
   return knex('products')
     .select('products.id as id', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url', 'sold', 'purchaser_id')
     .where('seller_id', req.params.id)
     .innerJoin('users', 'users.id', 'products.seller_id')
     .then( products => {
-
       if (!products[0]) {
-        console.log('user has no products for sale');
         res.setHeader("Content-Type", "application/json")
         res.send(JSON.stringify({id: req.params.id, products: []}))// need to fix this
       } else {
-      console.log('user has products for sale ', products);
-      let sendInfo = {products, id: req.params.id}
-      res.setHeader("Content-Type", "application/json")
-      res.send(JSON.stringify(sendInfo))
+        let sendInfo = {products, id: req.params.id}
+        res.setHeader("Content-Type", "application/json")
+        res.send(JSON.stringify(sendInfo))
       }
     })
 })
