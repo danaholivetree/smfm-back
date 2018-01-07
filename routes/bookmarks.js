@@ -36,6 +36,7 @@ router.post('/', function(req, res, next) {
   const bookmark = {user_id: userId, product_id: productId}
   return knex('bookmarks')
     .insert(bookmark, '*')
+    .select('bookmarks.id as id')
     .innerJoin('products', 'bookmarks.product_id', 'products.id')
     .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
     .innerJoin('users', 'users.id', 'products.seller_id')
