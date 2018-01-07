@@ -40,7 +40,6 @@ router.post('/', function(req, res, next) {
   console.log('cartItem ', cartItem) //correct
   return knex('cart')
     .insert(cartItem)
-    .returning('cart.id as id')
     .innerJoin('products', 'cart.product_id', 'products.id')
     .select('products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy')
     .innerJoin('users', 'users.id', 'products.seller_id')
