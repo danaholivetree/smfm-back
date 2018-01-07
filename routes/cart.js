@@ -32,34 +32,66 @@ router.get('/:id', function(req, res, next) {
     })
 });
 
+// router.post('/', function(req, res, next) {
+//   const {productId, userId} = req.body
+//   console.log('req.body ', productId, userId);
+//   //add error handling for missing fields
+//   const cartItem = {user_id: userId, product_id: productId, }
+//   console.log('cartItem ', cartItem) //correct
+//   return knex('cart')
+//     .insert(cartItem, '*')
+//     .innerJoin('products', 'cart.product_id', 'products.id')
+//     .select('products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy')
+//     .innerJoin('users', 'users.id', 'products.seller_id')
+//     .select('name as sellerName')
+//     .then( newCartItem => {
+//       console.log('new cart item info from db ', newCartItem[0]);
+//       res.setHeader('Content-type', 'application/json')
+//       res.send(JSON.stringify(newCartItem[0]))
+//     })
+// })
+
 router.post('/', function(req, res, next) {
   const {productId, userId} = req.body
-  console.log('req.body ', productId, userId);
-  //add error handling for missing fields
-  const cartItem = {user_id: userId, product_id: productId, }
-  console.log('cartItem ', cartItem) //correct
+  const cartItem = {user_id: userId, product_id: productId}
+  console.log(cartItem);
   return knex('cart')
-    .insert(cartItem)
-    .innerJoin('products', 'cart.product_id', 'products.id')
-    .select('products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy')
-    .innerJoin('users', 'users.id', 'products.seller_id')
-    .select('name as sellerName')
+    .insert(cartItem, '*')
     .first()
     .then( newCartItem => {
-      console.log('new cart item info from db ', newCartItem);
-      res.setHeader('Content-type', 'application/json')
-      res.send(JSON.stringify(newCartItem))
+      console.log('newcartitem ', newCartItem);
+      return knex('cart')
+        .where('cart.id', newCartItem.id)
+        .select('cart.id as id')
+        .innerJoin('products', 'cart.product_id', 'products.id')
+        .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
+        .innerJoin('users', 'users.id', 'products.seller_id')
+        .select('users.name as sellerName')
+        .then( cartItem => {
+          console.log('new cartitem info from db ', cartItem[0]);
+          res.setHeader('Content-type', 'application/json')
+          res.send(JSON.stringify(cartItem[0]))
+      })
     })
 })
 
 router.delete('/:id', function(req, res, next) {
+  let itemToDelete
   console.log('cartItem to delete ', req.params.id)
-  knex('cart')
-    .del()
+  return knex('cart')
     .where('id', req.params.id)
-    .then( deleted => {
-      res.setHeader('Content-type', 'application/json')
-      res.send(JSON.stringify(deleted))
+    .select()
+    .first()
+    .then( forDelete => {
+      itemToDelete = forDelete
+      knex('cart')
+        .del()
+        .where('id', req.params.id)
+        .then( deleted => {
+        console.log('deleted ', itemToDelete);
+        res.setHeader('Content-type', 'application/json')
+        res.send(JSON.stringify(itemToDelete))
+      })
     })
 })
 module.exports = router;

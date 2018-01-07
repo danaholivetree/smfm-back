@@ -30,33 +30,64 @@ router.get('/:id', function(req, res, next) {
     })
 });
 
+// router.post('/', function(req, res, next) {
+//   const {productId, userId} = req.body
+//   const bookmark = {user_id: userId, product_id: productId}
+//   console.log(bookmark);
+//   return knex('bookmarks')
+//     .insert(bookmark, '*')
+//     .select('bookmarks.id as id')
+//     .innerJoin('products', 'bookmarks.product_id', 'products.id')
+//     .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
+//     .innerJoin('users', 'users.id', 'products.seller_id')
+//     .select('users.name as sellerName')
+//     .then( newBookmark => {
+//       console.log('new bookmark info from db ', newBookmark[0]);
+//       res.setHeader('Content-type', 'application/json')
+//       res.send(JSON.stringify(newBookmark[0]))
+//     })
+// })
+
 router.post('/', function(req, res, next) {
   const {productId, userId} = req.body
-  //add error handling for missing fields
   const bookmark = {user_id: userId, product_id: productId}
+  console.log(bookmark);
   return knex('bookmarks')
     .insert(bookmark, '*')
-    .select('bookmarks.id as id')
-    .innerJoin('products', 'bookmarks.product_id', 'products.id')
-    .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
-    .innerJoin('users', 'users.id', 'products.seller_id')
-    .select('users.name as sellerName')
     .first()
     .then( newBookmark => {
-      console.log('new bookmark info from db ', newBookmark);
-      res.setHeader('Content-type', 'application/json')
-      res.send(JSON.stringify(newBookmark))
+      return knex('bookmarks')
+        .where('bookmarks.id', newBookmark.id)
+        .select('bookmarks.id as id')
+        .innerJoin('products', 'bookmarks.product_id', 'products.id')
+        .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
+        .innerJoin('users', 'users.id', 'products.seller_id')
+        .select('users.name as sellerName')
+        .then( newBookmark => {
+          console.log('new bookmark info from db ', newBookmark[0]);
+          res.setHeader('Content-type', 'application/json')
+          res.send(JSON.stringify(newBookmark[0]))
+      })
     })
 })
 
 router.delete('/:id', function(req, res, next) {
+  let itemToDelete
   console.log('bookmark to delete ', req.params.id)
-  knex('bookmarks')
-    .del()
+  return knex('bookmarks')
     .where('id', req.params.id)
-    .then( deleted => {
-      res.setHeader('Content-type', 'application/json')
-      res.send(JSON.stringify(deleted))
+    .select()
+    .first()
+    .then( forDelete => {
+      itemToDelete = forDelete
+      knex('bookmarks')
+        .del()
+        .where('id', req.params.id)
+        .then( deleted => {
+        console.log('deleted ', itemToDelete);
+        res.setHeader('Content-type', 'application/json')
+        res.send(JSON.stringify(itemToDelete))
+      })
     })
 })
 module.exports = router;
