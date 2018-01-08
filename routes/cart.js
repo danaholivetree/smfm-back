@@ -85,6 +85,33 @@ router.post('/', function(req, res, next) {
     })
 })
 
+router.put('/:id', (req, res, next) => {
+  let itemToEdit
+  console.log('req.cartQuantity to edit in PUT cart ', req.body.cartQuantity)
+  return knex('cart')
+    .where('id', req.params.id)
+    .select()
+    .first()
+    .then( edit => {
+      if (!edit) { // item wasn't in cart anyway
+        return //error handling later
+      }
+      console.log('item was in cart. id was ', req.params.id);
+      console.log('req.body.cartQuantity ', req.body.cartQuantity);
+      knex('cart')
+        .update({cart_quantity: req.body.cartQuantity})
+        .where('id', req.params.id)
+        .returning(['id', 'cart_quantity as cartQuantity'])
+        .then( updatedItem => {
+          console.log('updateditem ', updatedItem[0]);
+          res.setHeader('Content-type', 'application/json')
+          res.send(JSON.stringify(updatedItem[0]))
+        })
+    })
+})
+
+
+
 router.delete('/:id', function(req, res, next) {
   let itemToDelete
   console.log('cartItem to delete ', req.params.id)
