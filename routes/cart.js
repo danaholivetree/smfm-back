@@ -53,25 +53,35 @@ router.get('/:id', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
   const {productId, userId} = req.body
-  const cartItem = {user_id: userId, product_id: productId}
-  console.log(cartItem);
+  const cart = {user_id: userId, product_id: productId}
+  console.log('post cart ', cart);
   return knex('cart')
-    .insert(cartItem, '*')
+    .where('product_id', productId)
+    .andWhere('user_id', userId)
     .first()
-    .then( newCartItem => {
-      console.log('newcartitem ', newCartItem);
-      return knex('cart')
-        .where('cart.id', newCartItem.id)
-        .select('cart.id as id')
-        .innerJoin('products', 'cart.product_id', 'products.id')
-        .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
-        .innerJoin('users', 'users.id', 'products.seller_id')
-        .select('users.name as sellerName')
-        .then( cartItem => {
-          console.log('new cartitem info from db ', cartItem[0]);
-          res.setHeader('Content-type', 'application/json')
-          res.send(JSON.stringify(cartItem[0]))
-      })
+    .then( exists => {
+      if (exists) {
+        return
+      }
+      else {
+        knex('cart')
+          .insert(cart, '*')
+          .then( cartItem => {
+            console.log('cartItem[0] ', cartItem[0]);
+            return knex('cart')
+              .where('cart.id', cartItem[0].id)
+              .select('cart.id as id')
+              .innerJoin('products', 'cart.product_id', 'products.id')
+              .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
+              .innerJoin('users', 'users.id', 'products.seller_id')
+              .select('users.name as sellerName')
+              .then( newCartItem => {
+                console.log('new cartitem info from db ', newCartItem[0]);
+                res.setHeader('Content-type', 'application/json')
+                res.send(JSON.stringify(newCartItem[0]))
+            })
+        })
+      } //close else
     })
 })
 

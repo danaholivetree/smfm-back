@@ -51,24 +51,36 @@ router.get('/:id', function(req, res, next) {
 router.post('/', function(req, res, next) {
   const {productId, userId} = req.body
   const bookmark = {user_id: userId, product_id: productId}
-  console.log(bookmark);
+  console.log('post bookmark ', bookmark);
   return knex('bookmarks')
-    .insert(bookmark, '*')
+    .where('product_id', productId)
+    .andWhere('user_id', userId)
     .first()
-    .then( newBookmark => {
-      return knex('bookmarks')
-        .where('bookmarks.id', newBookmark.id)
-        .select('bookmarks.id as id')
-        .innerJoin('products', 'bookmarks.product_id', 'products.id')
-        .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
-        .innerJoin('users', 'users.id', 'products.seller_id')
-        .select('users.name as sellerName')
-        .then( newBookmark => {
-          console.log('new bookmark info from db ', newBookmark[0]);
-          res.setHeader('Content-type', 'application/json')
-          res.send(JSON.stringify(newBookmark[0]))
-      })
-    })
+    .then( exists => {
+      if (exists) {
+        // throw new Error('item already in bookmarks')
+        return
+      }
+      else {
+        knex('bookmarks')
+          .insert(bookmark, '*')
+          .then( newBookmark => {
+            console.log('newBookmark[0] ', newBookmark[0]);
+            return knex('bookmarks')
+              .where('bookmarks.id', newBookmark[0].id)
+              .select('bookmarks.id as id')
+              .innerJoin('products', 'bookmarks.product_id', 'products.id')
+              .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
+              .innerJoin('users', 'users.id', 'products.seller_id')
+              .select('users.name as sellerName')
+              .then( bm => {
+                console.log('new bookmark info from db ', bm[0]);
+                res.setHeader('Content-type', 'application/json')
+                res.send(JSON.stringify(bm[0]))
+            })
+        })
+      } //close else
+    }).catch(err => next(err))
 })
 
 router.delete('/:id', function(req, res, next) {
