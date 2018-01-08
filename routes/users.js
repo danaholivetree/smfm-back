@@ -4,8 +4,13 @@ const knex = require('../knex')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+  return knex('users')
+    .select('*')
+    .then( allUsers => {
+      res.setHeader('content-type', 'application/json')
+      res.send(JSON.stringify(allUsers))
+    })
+})
 
 //search products by user id
 router.get('/:id', function(req, res, next) {
