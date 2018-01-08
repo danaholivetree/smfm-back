@@ -67,7 +67,6 @@ router.post('/', function(req, res, next) {
         knex('cart')
           .insert(cart, '*')
           .then( cartItem => {
-            console.log('cartItem[0] ', cartItem[0]);
             return knex('cart')
               .where('cart.id', cartItem[0].id)
               .select('cart.id as id')
@@ -76,7 +75,7 @@ router.post('/', function(req, res, next) {
               .innerJoin('users', 'users.id', 'products.seller_id')
               .select('users.name as sellerName')
               .then( newCartItem => {
-                console.log('new cartitem info from db ', newCartItem[0]);
+                console.log('new cartitem info from db ', newCartItem[0])
                 res.setHeader('Content-type', 'application/json')
                 res.send(JSON.stringify(newCartItem[0]))
             })
