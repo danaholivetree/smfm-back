@@ -15,9 +15,9 @@ router.get('/', function(req, res, next) {
 
 //post new product
 router.post('/', function(req, res, next) {
-  const {sellerId, itemName, quantity, price, description, category} = req.body
+  const {sellerId, itemName, quantity, price, description, category, image} = req.body
   //add error handling for missing fields
-  const addThisProduct = {seller_id: sellerId, item_name: itemName, quantity, price, description, category}
+  const addThisProduct = {seller_id: sellerId, item_name: itemName, quantity, price, description, category, image_url: image}
   let newItem
   return knex('products')
     .insert(addThisProduct, '*')
@@ -29,6 +29,7 @@ router.post('/', function(req, res, next) {
         .select('name as sellerName')
         .first()
         .then( readyToSend => {
+          console.log('ready to send back from db ', readyToSend);
           res.setHeader('Content-type', 'application/json')
           res.send(JSON.stringify(readyToSend))
         })
