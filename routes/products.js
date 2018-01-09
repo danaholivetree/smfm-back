@@ -17,14 +17,14 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
   const {sellerId, itemName, quantity, price, description, category, image} = req.body
   //add error handling for missing fields
-  const addThisProduct = {seller_id: sellerId, item_name: itemName, quantity, price, description, category, image_url: image}
+  const addThisProduct = {seller_id: sellerId, item_name: itemName, quantity, price, description, category, image_url: image, thumbnail}
   let newItem
   return knex('products')
     .insert(addThisProduct, '*')
     .then( newProduct => {
       knex('products')
         .where('products.id', newProduct[0].id)
-        .select('products.id', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity', 'image_url as image', 'sold', 'purchaser_id as purchaserId')
+        .select('products.id', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity', 'image_url as image', 'sold', 'thumbnail', 'purchaser_id as purchaserId')
         .innerJoin('users', 'seller_id', 'users.id')
         .select('name as sellerName')
         .first()
