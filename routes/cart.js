@@ -15,7 +15,7 @@ router.get('/', function(req, res, next) {
 router.get('/:id', function(req, res, next) {
   console.log('getting to route for cart by user id, user id is ', req.params.id)
   return knex('cart')
-    .select('cart.id as id','products.id as productId', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'cart_quantity as cartQuantity', 'name as sellerName', 'image_url', 'sold', 'purchaser_id')
+    .select('cart.id as id','products.id as productId', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'cart_quantity as cartQuantity', 'name as sellerName', 'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id')
     .where('user_id', req.params.id)
     .innerJoin('products', 'cart.product_id', 'products.id')
     .innerJoin('users', 'users.id', 'products.seller_id')
@@ -71,7 +71,7 @@ router.post('/', function(req, res, next) {
               .where('cart.id', cartItem[0].id)
               .select('cart.id as id')
               .innerJoin('products', 'cart.product_id', 'products.id')
-              .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'sold', 'purchaser_id as purchasedBy'])
+              .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id as purchasedBy'])
               .innerJoin('users', 'users.id', 'products.seller_id')
               .select('users.name as sellerName')
               .then( newCartItem => {
