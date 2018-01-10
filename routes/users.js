@@ -48,9 +48,9 @@ router.post('/', function(req, res, next) {
           .insert({'fb_id': req.body.id, 'name': req.body.name})
           .returning('*')
           .then( newUser => {
-            console.log('user returned from insert ', newUser);
+            console.log('user returned from insert ', newUser[0]);
             res.setHeader("Content-Type", "application/json")
-            res.send(JSON.stringify({user: newUser}))
+            res.send(JSON.stringify({id: newUser[0].id}))
           })
       }
       console.log('user was in db');
