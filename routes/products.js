@@ -15,10 +15,15 @@ router.get('/', function(req, res, next) {
 
 //post new product
 router.post('/', function(req, res, next) {
+  console.log('got to post product route');
   const {sellerId, itemName, quantity, price, description, category, image, thumbnail} = req.body
   console.log('req.body');
   //add error handling for missing fields
-  const addThisProduct = {seller_id: sellerId, item_name: itemName, quantity, price, description, category, image_url: image, thumbnail_url: thumbnail}
+  const addThisProduct = {seller_id: sellerId, item_name: itemName, quantity, price, description, category}
+  if (image && thumbnail) {
+     addThisProduct.image_url = image
+     addThisProduct.thumbnail_url = thumbnail
+  }
   let newItem
   return knex('users')
     .where('id', sellerId)
