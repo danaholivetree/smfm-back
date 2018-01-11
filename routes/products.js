@@ -8,6 +8,7 @@ router.get('/', function(req, res, next) {
     .select('products.id as id', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id as purchaserId')
     .innerJoin('users', 'users.id', 'products.seller_id')
     .then ( products => {
+      console.log('got all products ', products);
       res.setHeader('Content-type', 'application/json')
       res.send(JSON.stringify(products))
     })
@@ -51,9 +52,32 @@ router.post('/', function(req, res, next) {
 //edit a product
 router.put('/:id', function(req, res, next) {
   console.log('getting to route for editing single item, item id is', req.params.id, ' and req.body is ', req.body)
-  const {name, category, description, price, quantity} = req.body
+  const {itemName, category, description, price, quantity, imageUrl, thumbnailUrl} = req.body
+  var product = {}
+  if (itemName) {
+    product.item_name = itemName
+  }
+  if (category) {
+    product.category = category
+  }
+  if (description) {
+    product.description = description
+  }
+  if (price) {
+    product.price = price
+  }
+  if (quantity) {
+    product.quantity = quantity
+  }
+  if (imageUrl) {
+    product.image_url = imageUrl
+  }
+  if (thumbnailUrl) {
+    product.thumbnail_url = thumbnailUrl
+  }
+
   return knex('products')
-    .update({name, category, description, price, quantity}, ['id', 'name', 'category', 'description', 'price', 'quantity'])
+    .update(product, '*')
     .where('id', req.params.id)
     .then( product => {
       console.log('edited product ', product)

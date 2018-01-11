@@ -52,8 +52,8 @@ router.get('/:id', function(req, res, next) {
 // })
 
 router.post('/', function(req, res, next) {
-  const {productId, userId} = req.body
-  const cart = {user_id: userId, product_id: productId}
+  const {productId, userId, cartQuantity} = req.body
+  const cart = {user_id: userId, product_id: productId, cart_quantity: cartQuantity}
   console.log('post cart ', cart);
   return knex('cart')
     .where('product_id', productId)
@@ -69,7 +69,7 @@ router.post('/', function(req, res, next) {
           .then( cartItem => {
             return knex('cart')
               .where('cart.id', cartItem[0].id)
-              .select('cart.id as id')
+              .select('cart.id as id', 'cart.cart_quantity as cartQuantity')
               .innerJoin('products', 'cart.product_id', 'products.id')
               .select(['products.id as productId', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity',  'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id as purchasedBy'])
               .innerJoin('users', 'users.id', 'products.seller_id')

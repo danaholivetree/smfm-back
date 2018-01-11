@@ -14,6 +14,7 @@ router.get('/', function(req, res, next) {
 
 //search products by user id
 router.get('/:id', function(req, res, next) {
+  console.log('getting users products for sale ');
   return knex('products')
     .select('products.id as id', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id')
     .where('seller_id', req.params.id)
@@ -23,6 +24,7 @@ router.get('/:id', function(req, res, next) {
         res.setHeader("Content-Type", "application/json")
         res.send(JSON.stringify({id: req.params.id, products: []}))// need to fix this
       } else {
+          console.log('getting users products for sale ', products);
         let sendInfo = {products, id: req.params.id}
         res.setHeader("Content-Type", "application/json")
         res.send(JSON.stringify(sendInfo))
