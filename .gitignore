@@ -59,3 +59,5 @@ typings/
 
 # lock file junk
 package-lock.json
+
+.DS_Store
