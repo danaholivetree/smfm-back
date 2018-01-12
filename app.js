@@ -15,6 +15,7 @@ var products = require('./routes/products');
 var bookmarks = require('./routes/bookmarks');
 var cart = require('./routes/cart');
 var sign = require('./routes/sign')
+var stripe = require('./routes/stripe')
 
 var app = express();
 
@@ -43,6 +44,7 @@ app.use('/products', products);
 app.use('/bookmarks', bookmarks);
 app.use('/cart', cart);
 app.use('/sign', sign)
+app.use('/stripe', stripe)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

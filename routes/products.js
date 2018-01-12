@@ -25,7 +25,7 @@ router.post('/', function(req, res, next) {
      addThisProduct.image_url = image
      addThisProduct.thumbnail_url = thumbnail
   }
-  let newItem
+  // let newItem
   return knex('users')
     .where('id', sellerId)
     .update('is_seller', true)
