@@ -11,13 +11,15 @@ router.get('/:id', function(req, res, next) {
   request.post(`https://connect.stripe.com/oauth/token?client_secret=${clientSecret}&code=${req.query.code}&grant_type=authorization_code`,
      { json: true }, (err, res, body) => {
     if (err) { return console.log(err); }
-
     console.log('body ', body);
     const {access_token, stripe_user_id, stripe_publishable_key} = body
-    const stripeUser = {access_token, stripe_user_id, stripe_publishable_key}
+    const stripeUser = {access_token, stripe_user_id, stripe_publishable_key, isSeller:true}
     return knex('users')
       .where('id', req.params.id)
-      .insert(stripeUser)
+      .update(stripeUser, '*')
+      .then( userInfo[0] => {
+        res.redirect('/')
+      })
     }) //close post
   }//close if
 })
