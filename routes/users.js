@@ -23,13 +23,20 @@ router.get('/:id', function(req, res, next) {
       console.log(products);
       if (!products[0]) {
         res.setHeader("Content-Type", "application/json")
+        res.setHeader('Set-Cookie', [`smfmId=${req.params.id}`]);
+        const headerNames = res.getHeaders()
+        console.log('headerNames ', headerNames);
         res.send(JSON.stringify({id: req.params.id, products: []}))// need to fix this
       } else {
           console.log('getting users products for sale ', products);
-        let sendInfo = {products, id: req.params.id} ///isseller:true was here
-        res.setHeader("Content-Type", "application/json")
-        res.send(JSON.stringify(sendInfo))
-      }
+          let sendInfo = {products, id: req.params.id} ///isseller:true was here
+          res.setHeader("Content-Type", "application/json")
+          // res.setHeader('Set-Cookie', [`smfmId=${req.params.id}`]);
+          // const headerNames = res.getHeaders()
+          // console.log('headerNames ', headerNames)
+          
+          res.send(JSON.stringify(sendInfo))
+        }
     })
 })
 
@@ -53,6 +60,7 @@ router.post('/', function(req, res, next) {
           .then( newUser => {
             console.log('user returned from insert ', newUser[0]);
             res.setHeader("Content-Type", "application/json")
+            res.setHeader('Set-Cookie', [`smfmId=${newUser[0].id}`]);
             res.send(JSON.stringify({id: newUser[0].id, isSeller: false}))
           })
       }

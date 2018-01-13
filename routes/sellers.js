@@ -24,6 +24,7 @@ router.post('/', (req, res, next) => {
       console.log('idsArr ', idsArr);
       return knex('products')
         .whereIn('seller_id', idsArr)
+        .where('sold', false)
         .select('products.id as id', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id as purchaserId')
         .innerJoin('users', 'users.id', 'products.seller_id')
         .then( friendsProducts => {
