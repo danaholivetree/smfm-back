@@ -26,7 +26,7 @@ router.get('/:id', function(req, res, next) {
         res.send(JSON.stringify({id: req.params.id, products: []}))// need to fix this
       } else {
           console.log('getting users products for sale ', products);
-        let sendInfo = {products, id: req.params.id, isSeller: true}
+        let sendInfo = {products, id: req.params.id} ///isseller:true was here
         res.setHeader("Content-Type", "application/json")
         res.send(JSON.stringify(sendInfo))
       }
@@ -48,12 +48,12 @@ router.post('/', function(req, res, next) {
       if (!exists) {
           console.log('user was not in db, inserting ');
         return knex('users')
-          .insert({'fb_id': req.body.id, 'name': req.body.name})
+          .insert({'fb_id': req.body.id, 'name': req.body.name, is_seller: false})
           .returning('*')
           .then( newUser => {
             console.log('user returned from insert ', newUser[0]);
             res.setHeader("Content-Type", "application/json")
-            res.send(JSON.stringify({id: newUser[0].id}))
+            res.send(JSON.stringify({id: newUser[0].id, isSeller: false}))
           })
       }
       console.log('user was in db');

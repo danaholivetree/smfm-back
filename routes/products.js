@@ -4,6 +4,7 @@ var knex = require('../knex')
 
 /* GET all products */
 router.get('/', function(req, res, next) {
+  console.log('req.body in get products ', req.body);
   return knex('products')
     .select('products.id as id', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id as purchaserId')
     .innerJoin('users', 'users.id', 'products.seller_id')

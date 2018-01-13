@@ -15,6 +15,7 @@ var products = require('./routes/products');
 var bookmarks = require('./routes/bookmarks');
 var cart = require('./routes/cart');
 var stripeauth = require('./routes/stripeauth')
+var sellers = require('./routes/sellers')
 
 var app = express();
 
@@ -37,12 +38,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
-app.use('/products', products);
-app.use('/bookmarks', bookmarks);
-app.use('/cart', cart);
+app.use('/', index)
+app.use('/users', users)
+app.use('/products', products)
+app.use('/bookmarks', bookmarks)
+app.use('/cart', cart)
 app.use('/stripeauth', stripeauth)
+app.use('/sellers', sellers)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
