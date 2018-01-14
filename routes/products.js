@@ -53,7 +53,7 @@ router.post('/', function(req, res, next) {
 //edit a product
 router.put('/:id', function(req, res, next) {
   console.log('getting to route for editing single item, item id is', req.params.id, ' and req.body is ', req.body)
-  const {itemName, category, description, price, quantity, imageUrl, thumbnailUrl} = req.body
+  const {itemName, category, description, price, quantity, image, thumbnail} = req.body
   var product = {}
   if (itemName) {
     product.item_name = itemName
@@ -70,10 +70,10 @@ router.put('/:id', function(req, res, next) {
   if (quantity) {
     product.quantity = quantity
   }
-  if (imageUrl) {
+  if (image) {
     product.image_url = imageUrl
   }
-  if (thumbnailUrl) {
+  if (thumbnail) {
     product.thumbnail_url = thumbnailUrl
   }
 
@@ -81,9 +81,20 @@ router.put('/:id', function(req, res, next) {
     .update(product, '*')
     .where('id', req.params.id)
     .then( product => {
-      console.log('edited product ', product)
+      console.log('edited product ', product[0])
+      const {id, seller_id, item_name, category, price, quantity, description, image_url, thumbnail_url, sold, purchaser_id} = product[0]
+      const editedProduct = {
+        id,
+        sellerId: seller_id,
+        itemName: item_name,
+        category, price, quantity, description,
+        image: image_url,
+        thumbnail: thumbnail_url,
+        sold,
+        purchaserId: purchaser_id
+      }
       res.setHeader("Content-Type", "application/json")
-      res.send(JSON.stringify(product))
+      res.send(JSON.stringify(editedProduct))
     })
 })
 
