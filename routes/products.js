@@ -4,9 +4,8 @@ var knex = require('../knex')
 
 /* GET all products */
 router.get('/', function(req, res, next) {
-  console.log('req.body in get products ', req.body);
   return knex('products')
-    .select('products.id as id', 'seller_id as sellerId' ,'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id as purchaserId')
+    .select('products.id as id', 'seller_id as sellerId' , 'users.fb_id as sellerFb', 'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id as purchaserId')
     .innerJoin('users', 'users.id', 'products.seller_id')
     .then ( products => {
       console.log('got all products ', products);
@@ -17,9 +16,7 @@ router.get('/', function(req, res, next) {
 
 //post new product
 router.post('/', function(req, res, next) {
-  console.log('got to post product route');
   const {sellerId, itemName, quantity, price, description, category, image, thumbnail} = req.body
-  console.log('req.body');
   //add error handling for missing fields
   const addThisProduct = {seller_id: sellerId, item_name: itemName, quantity, price, description, category}
   if (image && thumbnail) {
@@ -37,12 +34,11 @@ router.post('/', function(req, res, next) {
         .then( newProduct => {
           knex('products')
             .where('products.id', newProduct[0].id)
-            .select('products.id', 'seller_id as sellerId', 'item_name as itemName', 'description', 'category', 'price', 'quantity', 'image_url as image', 'sold', 'thumbnail_url as thumbnail', 'purchaser_id as purchaserId')
+            .select('products.id', 'seller_id as sellerId', 'users.fb_id as sellerFb', 'item_name as itemName', 'description', 'category', 'price', 'quantity', 'image_url as image', 'sold', 'thumbnail_url as thumbnail', 'purchaser_id as purchaserId')
             .innerJoin('users', 'seller_id', 'users.id')
             .select('name as sellerName')
             .first()
             .then( readyToSend => {
-              console.log('ready to send back from db ', readyToSend);
               res.setHeader('Content-type', 'application/json')
               res.send(JSON.stringify(readyToSend))
             })
@@ -52,8 +48,7 @@ router.post('/', function(req, res, next) {
 
 //edit a product
 router.put('/:id', function(req, res, next) {
-  console.log('getting to route for editing single item, item id is', req.params.id, ' and req.body is ', req.body)
-  const {itemName, category, description, price, quantity, image, thumbnail} = req.body
+  const {itemName, category, description, price, quantity, image, thumbnail, sellerFb} = req.body
   var product = {}
   if (itemName) {
     product.item_name = itemName
@@ -81,11 +76,11 @@ router.put('/:id', function(req, res, next) {
     .update(product, '*')
     .where('id', req.params.id)
     .then( product => {
-      console.log('edited product ', product[0])
       const {id, seller_id, item_name, category, price, quantity, description, image_url, thumbnail_url, sold, purchaser_id} = product[0]
       const editedProduct = {
         id,
         sellerId: seller_id,
+        sellerFb: sellerFb,
         itemName: item_name,
         category, price, quantity, description,
         image: image_url,
@@ -110,8 +105,6 @@ router.delete('/:id', function(req, res, next) {
         .del()
         .where('id', req.params.id)
         .then( deleted => {
-          console.log('deleted ', deleted);
-          console.log('item to delete ', itemToDelete);
           res.setHeader("Content-Type", "application/json")
           res.send(JSON.stringify(itemToDelete))
         })
