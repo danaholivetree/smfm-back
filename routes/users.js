@@ -16,7 +16,7 @@ router.get('/', function(req, res, next) {
 router.get('/:id', function(req, res, next) {
   console.log('getting users products for sale and whether seller')
   return knex('products')
-    .select('products.id as id', 'seller_id as sellerId', 'users.fb_id as sellerFb', 'item_name as itemName', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id')
+    .select('products.id as id', 'seller_id as sellerId', 'users.fb_id as sellerFb', 'item_name as itemName', 'short', 'description', 'category', 'price', 'quantity', 'name as sellerName', 'image_url as image', 'thumbnail_url as thumbnail', 'sold', 'purchaser_id')
     .where('seller_id', req.params.id)
     .innerJoin('users', 'users.id', 'products.seller_id')
     .then( products => {

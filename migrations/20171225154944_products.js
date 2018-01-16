@@ -7,6 +7,7 @@ exports.up = function(knex, Promise) {
     t.text('category').notNullable()
     t.varchar('price', 255).notNullable().defaultTo("0.00")
     t.integer('quantity').notNullable().defaultTo(1)
+    t.varchar('short', 255).notNullable().defaultTo("")
     t.text('description').notNullable().defaultTo("")
     t.varchar('external').notNullable().defaultTo('')
     t.varchar('image_url').notNullable().defaultTo("http://res.cloudinary.com/smfm/image/upload/v1515529611/notavail.jpg")
